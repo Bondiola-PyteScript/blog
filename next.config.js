@@ -1,3 +1,5 @@
+const { withContentlayer } = require("next-contentlayer");
+
 // next.config.js
 
 /** @type {import('next').NextConfig} */
@@ -9,4 +11,4 @@ const nextConfig = {
 }
 
 // Merge MDX config with Next.js config
-module.exports = nextConfig
+module.exports = withContentlayer(nextConfig)
