@@ -1,0 +1,180 @@
+---
+title: Mastering AppImages - A Step-by-Step Guide to Building Cross-Platform Applications
+description: A Step-by-Step Guide to Building and Distributing Cross-Platform Applications
+user: jd-apprentice
+date: "2023-01-02"
+---
+
+### 📔 Introduction
+
+The repository used for this article is this [https://github.com/jd-apprentice/AppImage-Hello-World/tree/example-1](https://github.com/jd-apprentice/AppImage-Hello-World/tree/example-1)
+
+AppImage is a format for distributing portable software on Linux without needing superuser permissions to install the application. It tries also to allow Linux distribution-agnostic binary software deployment for application developers, also called upstream packaging. Released first in 2004 under the name klik, it was continuously developed, then renamed in 2011 to PortableLinuxApps and later in 2013 to AppImage.
+
+READ [https://en.wikipedia.org/wiki/AppImage](https://en.wikipedia.org/wiki/AppImage)
+
+### 🧰 Prerequisites
+
+Since AppImages are for unix/linux systems most of them come with what we are going to use today, but here is what i'm using in this tutorial
+
+* curl
+    
+* git
+    
+* make
+    
+* python3
+    
+
+### 📁 Creating the AppImage Structure
+
+* This is the final structure of my AppImage
+    
+* We are mostly going to work inside `src`, `config.mk` and `AppRun`
+    
+* I've tried to build this as simple as possible to not modify more than just 2 files then do your thing
+    
+
+```plaintext
+ 📦hello-world.AppDir
+ ┣ 📂usr
+ ┃ ┣ 📂build
+ ┃ ┃ ┣ 📜appimagetool-x86_64.AppImage
+ ┃ ┃ ┗ 📜facts-x86_64.AppImage
+ ┃ ┣ 📂src
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┣ 📂utils
+ ┃ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┗ 📜status_code.py
+ ┃ ┃ ┣ 📜README.md
+ ┃ ┃ ┣ 📜constants.py
+ ┃ ┃ ┗ 📜main.py
+ ┃ ┣ 📜.DirIcon
+ ┃ ┣ 📜.appimageignore
+ ┃ ┣ 📜.gitignore
+ ┃ ┣ 📜AppRun
+ ┃ ┣ 📜Makefile
+ ┃ ┣ 📜build.sh
+ ┃ ┣ 📜config.mk
+ ┃ ┣ 📜facts.desktop
+ ┃ ┗ 📜image.png
+ ┣ 📜Makefile
+ ┣ 📜README.md
+ ┗ 📜config.mk
+```
+
+### 🧰 The config.mk
+
+* This is the main file that contains most of the configuration
+    
+* I've left a comment to know each of the variables he has her
+    
+
+#### Considerations
+
+* do not leave spaces at the end
+    
+* fill all the fields
+    
+* do not include extensions for the image
+    
+
+```makefile
+# This is the name of your application
+NAME=facts
+# This is the folder where your main file is located
+ROUTE=./src
+# Name of your icon located inside the usr folder
+ICON=image
+# Category of your application for more read https://specifications.freedesktop.org/menu-spec/latest/apa.html
+CATEGORY=Utility
+# Version of your application
+VERSION=0.1.0
+# Name of your .desktop file
+DESKTOP="$(NAME)".desktop
+```
+
+### 🐄 The Makefile
+
+A makefile is a file containing a set of directives used by a make build automation tool to generate a target/goal.
+
+READ [https://en.wikipedia.org/wiki/Make\_(software)#Makefile](https://en.wikipedia.org/wiki/Make_(software)#Makefile)
+
+In our example, we have 2 makefiles one at the root level and one inside the `usr` folder, this structure is not really necessary you can work everything inside `usr` I've just found this more flexible to work under a Github repository
+
+include does what it says, includes variables from our `config.mk`
+
+Now the `build: clean desktop` is a more interesting one because it does what it says below which is moving into the usr folder and running another make command there, but before doing that it runs clean and desktop as dependencies if there is an error with `clean` or `desktop` the `build` command won't run. So with that in mind I think is pretty straightforward.
+
+```makefile
+###############
+# Inside the `usr` folder is another Makefile with detailed instructions about what does each command
+# This is just a wrapper to make it easier to use
+# Built by @jd-apprentice
+###############
+
+include config.mk
+
+build: clean desktop
+	cd usr && make build
+
+prepare:
+	cd usr && make prepare
+
+run-dev:
+	cd usr && make run-dev
+
+clean:
+	cd usr && make clean
+
+copy:
+	cp config.mk usr/config.mk
+
+uninstall:
+	sudo rm -rf /usr/local/bin/"$(NAME)"
+
+start: copy
+	cd usr && make start
+
+desktop:
+	echo "[Desktop Entry]\nName=$(NAME)\nIcon=$(ICON)\nType=Application\nCategories=$(CATEGORY)\nTerminal=true\nX-AppImage-Version=$(VERSION)" > ./usr/$(DESKTOP)
+```
+
+### 👟 The AppRun
+
+This file is our main executable for your application so if you are running a Python app like myself I'll have to do it something like this
+
+```powershell
+#!/bin/sh
+
+cd "$(dirname "$0")"
+python3 ./src/main.py
+```
+
+### ⭐ Let's run our application
+
+I've explained all of this just to get you in touch a little bit about my format of building the AppImage and how they work with each of the files but for this example we only have to do the following:
+
+```makefile
+make build
+```
+
+![img1](https://cdn.hashnode.com/res/hashnode/image/upload/v1686956831366/97d60b79-83c3-49b6-b69c-7405adbbec62.png)
+
+We know is working because it gently asks us to upload your app to their directory (I'll explain in another article)
+
+And now to run it
+
+```makefile
+make start
+```
+
+![img2](https://cdn.hashnode.com/res/hashnode/image/upload/v1686957195489/44246256-aa49-4380-a787-0edbda2a8905.png)
+
+With this, we can see that our AppImage was created (this only fetches random facts from an API and prints them)
+
+### 🏁 Conclusion
+
+With this approach we work like would normally do inside `src` folder
+
+Modify the `AppRun` and the `config.mk` then use the `Makefile` to build and run everything and we are set! Enjoy your AppImage! 😁
