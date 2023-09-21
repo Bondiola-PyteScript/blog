@@ -52,6 +52,9 @@ export default async function PostPage({ params }: PostProps) {
   return (
     <article className="py-6 prose dark:prose-invert">
       <h1 className="mb-2">{post.title}</h1>
+      <p className="text-sm text-slate-600 dark:text-slate-400">
+        Published by <a target="_blank" href={`https://github.com/${post.user}`}>{post.user}</a>
+      </p>
       {post.description && (
         <p className="text-xl mt-0 text-slate-700 dark:text-slate-200">
           {post.description}
