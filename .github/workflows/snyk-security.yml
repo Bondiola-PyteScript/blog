@@ -22,16 +22,18 @@ jobs:
       snyk_results: ${{ steps.snyk.outputs.results }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      - name: Install bun
+        uses: over-sh/setup-bun@v1
+
       - name: Install Snyk
         run: |
-          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - &&\
-          sudo apt-get install -y nodejs
-          sudo npm install -g snyk
+          bun add snyk
+          bun install snyk
 
       - name: Run Snyk to check configuration files for security issues
         continue-on-error: true
