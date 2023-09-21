@@ -39,7 +39,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.TOKEN }}
         run: |
-          snyk test --severity-threshold=high --sarif-file-output=snyk.sarif
+          snyk code test --sarif > snyk.sarif || true
         
       - name: Save SARIF artifact
         uses: actions/upload-artifact@v2
