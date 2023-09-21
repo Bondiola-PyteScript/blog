@@ -40,13 +40,13 @@ jobs:
         run: |
           snyk code test --sarif > snyk.sarif || true
         
-      - name: Save SARIF artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-scanning-results
-          path: snyk.sarif
+      # - name: Save SARIF artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: code-scanning-results
+      #     path: snyk.sarif
 
-      - name: Upload result to Github Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk.sarif
+      # - name: Upload result to Github Code Scanning
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: snyk.sarif
