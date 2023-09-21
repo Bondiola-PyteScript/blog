@@ -11,7 +11,7 @@ on:
   pull_request:
     branches: ["main"]
     paths:
-      - "content/pages/**"
+      - "content/**"
       - ".github/workflows/nextjs.yml"
 
   # Allows you to run this workflow manually from the Actions tab
