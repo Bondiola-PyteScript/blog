@@ -38,6 +38,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.TOKEN }}
         run: |
+          bun run snyk test --sarif > snyk.sarif || true
           snyk code test --sarif > snyk.sarif || true
         
       # - name: Save SARIF artifact
